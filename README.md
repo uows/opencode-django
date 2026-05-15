@@ -29,16 +29,19 @@ Plataforma de gestión escolar construida con Django 5. Orientada a colegios y l
 # 1. Clonar o ubicarse en el proyecto
 cd educore
 
-# 2. Instalar dependencias
+# 2. Crear archivo de variables de entorno (copiar el ejemplo)
+cp .env.example .env
+
+# 3. Instalar dependencias
 pip install -r requirements.txt
 
-# 3. Migrar base de datos
+# 4. Migrar base de datos
 python manage.py migrate
 
-# 4. (Opcional) Cargar datos de prueba
+# 5. (Opcional) Cargar datos de prueba
 python manage.py seed_data
 
-# 5. Iniciar servidor
+# 6. Iniciar servidor
 python manage.py runserver
 ```
 
