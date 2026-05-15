@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Cursos</h1>
+        <p class="text-gray-500 mt-1">
+            {% if user.role == 'STUDENT' %}Tus cursos{% else %}Gestión de cursos{% endif %}
+        </p>
+    </div>
+    {% if user.role == 'TEACHER' or user.role == 'ADMIN' %}
+    <a href="{% url 'course_create' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">+ Nuevo Curso</a>
+    {% endif %}
+</div>
+
+{% if courses %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for course in courses %}
+    <a href="{% url 'course_detail' course.pk %}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-200 transition-all group">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <span class="text-indigo-600 font-bold text-sm">{{ course.name|first }}</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900 group-hover:text-primary-600">{{ course.name }}</h3>
+                <p class="text-xs text-gray-400">{{ course.grade }} · {{ course.year }}</p>
+            </div>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-500">Profesor: {{ course.teacher.get_full_name|default:'—' }}</span>
+            <span class="text-primary-500 font-medium text-xs">Ver más →</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-400">
+    <p class="text-lg">No hay cursos disponibles.</p>
+    {% if user.role == 'TEACHER' or user.role == 'ADMIN' %}
+    <a href="{% url 'course_create' %}" class="text-primary-500 hover:text-primary-600 font-medium mt-2 inline-block">Crear el primer curso</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

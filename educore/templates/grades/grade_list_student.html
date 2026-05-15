@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Mis Notas</h1>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <p class="text-sm text-gray-500">Promedio General</p>
+        <p class="text-3xl font-bold {% if average and average >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ average|default:'—' }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <p class="text-sm text-gray-500">Total de Notas</p>
+        <p class="text-3xl font-bold text-gray-900">{{ grades|length }}</p>
+    </div>
+</div>
+
+{% regroup grades by subject as subject_grades %}
+<div class="space-y-4">
+    {% for subject in subject_grades %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="font-semibold text-gray-900">{{ subject.grouper.name }}</h3>
+            <p class="text-xs text-gray-400">{{ subject.grouper.course.name }}</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left py-3 px-5 font-medium text-gray-500">Nota</th>
+                        <th class="text-left py-3 px-5 font-medium text-gray-500">Coeficiente</th>
+                        <th class="text-left py-3 px-5 font-medium text-gray-500">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grade in subject.list %}
+                    <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <td class="py-3 px-5 font-medium {% if grade.score >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ grade.score }}</td>
+                        <td class="py-3 px-5 text-gray-600">{{ grade.coefficient }}</td>
+                        <td class="py-3 px-5 text-gray-500">{{ grade.date|date:'d/m/Y' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 text-right">
+            {% with total=subject.list|length %}
+            {% with suma=subject.list|dictsort:'score' %}
+            <span class="text-sm text-gray-600">
+                Promedio: <strong>{% widthratio total 1 0 %}</strong>
+            </span>
+            {% endwith %}
+            {% endwith %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-12 text-gray-400">
+        <p>No tienes notas registradas aún.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

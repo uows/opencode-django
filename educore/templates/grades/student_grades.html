@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-6">
+    <a href="javascript:history.back()" class="text-sm text-gray-500 hover:text-primary-500 mb-2 inline-block">← Volver</a>
+    <h1 class="text-2xl font-bold text-gray-900">{{ student.get_full_name }}</h1>
+    <p class="text-gray-500 mt-1">{{ student.email }}</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <p class="text-sm text-gray-500">Promedio General</p>
+        <p class="text-3xl font-bold {% if average and average >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ average|default:'—' }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900 mb-4">Promedio por Asignatura</h3>
+        {% if by_subject %}
+        <canvas id="avgChart" height="200"></canvas>
+        {% else %}
+        <p class="text-gray-400 text-sm">Sin datos.</p>
+        {% endif %}
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900 mb-4">Resumen</h3>
+        {% if by_subject %}
+        <div class="space-y-2">
+            {% for item in by_subject %}
+            <div class="flex items-center justify-between p-2 rounded bg-gray-50">
+                <span class="text-sm font-medium text-gray-700">{{ item.subject__name }}</span>
+                <span class="text-sm font-bold {% if item.avg >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ item.avg|floatformat:1 }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-200">
+        <h3 class="font-semibold text-gray-900">Todas las Notas</h3>
+    </div>
+    {% if grades %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-100 bg-gray-50">
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Asignatura</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Nota</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Coef.</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4 text-gray-900">{{ grade.subject.name }}</td>
+                    <td class="py-3 px-4 font-medium {% if grade.score >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ grade.score }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ grade.coefficient }}</td>
+                    <td class="py-3 px-4 text-gray-500">{{ grade.date|date:'d/m/Y' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">Sin notas registradas.</p>
+    {% endif %}
+</div>
+
+{% if by_subject %}
+<script>
+    new Chart(document.getElementById('avgChart'), {
+        type: 'bar',
+        data: {
+            labels: [{% for item in by_subject %}'{{ item.subject__name }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Promedio',
+                data: [{% for item in by_subject %}{{ item.avg|floatformat:1 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                borderColor: '#4F46E5',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { min: 1, max: 7, ticks: { stepSize: 1 } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Tareas</h1>
+        <p class="text-gray-500 mt-1">{% if is_teacher %}Gestión de tareas{% else %}Tus tareas pendientes y entregadas{% endif %}</p>
+    </div>
+    {% if is_teacher %}
+    <a href="{% url 'assignment_create' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">+ Nueva Tarea</a>
+    {% endif %}
+</div>
+
+{% if assignments %}
+<div class="space-y-3">
+    {% for assignment in assignments %}
+    <a href="{% url 'assignment_detail' assignment.pk %}" class="block bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-200 transition-all">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-semibold text-gray-900">{{ assignment.title }}</h3>
+                    {% if assignment.due_date < now %}
+                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">Vencida</span>
+                    {% else %}
+                    <span class="text-xs bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-medium">Activa</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-gray-500">{{ assignment.subject.name }} · {{ assignment.subject.course.name }}</p>
+                {% if assignment.description %}
+                <p class="text-sm text-gray-400 mt-1">{{ assignment.description|truncatechars:120 }}</p>
+                {% endif %}
+            </div>
+            <div class="text-right ml-4 flex-shrink-0">
+                <p class="text-xs text-gray-400">{% if assignment.due_date < now %}Vencía:{% else %}Entrega:{% endif %}</p>
+                <p class="text-sm font-medium text-gray-700">{{ assignment.due_date|date:'d/m/Y H:i' }}</p>
+                {% if assignment.attachment %}
+                <span class="text-xs text-primary-500 mt-1 inline-block">📎 Archivo</span>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-400">
+    <p class="text-lg">No hay tareas disponibles.</p>
+    {% if is_teacher %}
+    <a href="{% url 'assignment_create' %}" class="text-primary-500 hover:text-primary-600 font-medium mt-2 inline-block">Crear la primera tarea</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

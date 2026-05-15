@@ -1,0 +1,17 @@
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+    <button data-toggle-sidebar class="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="flex items-center gap-3 ml-auto">
+        <div class="text-right hidden sm:block">
+            <p class="text-sm font-medium text-gray-700">{{ user.get_full_name }}</p>
+            <p class="text-xs text-gray-400">{{ user.get_role_display }}</p>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold text-sm">
+            {{ user.first_name|first|default:user.email|first|upper }}{{ user.last_name|first|upper }}
+        </div>
+        <a href="{% url 'logout' %}" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50" title="Cerrar sesión">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </a>
+    </div>
+</header>

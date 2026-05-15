@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCore{% if title %} - {{ title }}{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {500: '#4F46E5', 600: '#4338CA', 700: '#3730A3'},
+                        accent: {500: '#059669', 600: '#047857'},
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        {% if user.is_authenticated %}
+        {% include 'components/sidebar.html' %}
+        {% endif %}
+        <div class="flex-1 flex flex-col overflow-hidden {% if user.is_authenticated %}lg:ml-64{% endif %}">
+            {% if user.is_authenticated %}
+            {% include 'components/navbar.html' %}
+            {% endif %}
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                {% if messages %}
+                <div class="mb-4 space-y-2">
+                    {% for message in messages %}
+                    <div class="p-3 rounded-lg text-sm {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %} flex justify-between items-center">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="ml-2 font-bold">&times;</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-toggle-sidebar]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('[data-sidebar]').classList.toggle('-translate-x-full');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

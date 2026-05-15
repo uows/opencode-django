@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Notas</h1>
+        <p class="text-gray-500 mt-1">Gestión de notas</p>
+    </div>
+    <a href="{% url 'grade_create' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">+ Nueva Nota</a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+    <form method="get" class="flex flex-wrap gap-3 items-end">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Curso</label>
+            <select name="course" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                <option value="">Todos</option>
+                {% for c in courses %}
+                <option value="{{ c.pk }}" {% if selected_course|stringformat:'s' == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% if subjects %}
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Asignatura</label>
+            <select name="subject" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                <option value="">Todas</option>
+                {% for s in subjects %}
+                <option value="{{ s.pk }}" {% if selected_subject|stringformat:'s' == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    {% if grades %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-200 bg-gray-50">
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Alumno</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Asignatura</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Curso</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Nota</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Coef.</th>
+                    <th class="text-left py-3 px-4 font-medium text-gray-500">Fecha</th>
+                    <th class="text-right py-3 px-4 font-medium text-gray-500">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4 font-medium text-gray-900">{{ grade.student.get_full_name }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ grade.subject.name }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ grade.subject.course.name }}</td>
+                    <td class="py-3 px-4 font-medium {% if grade.score >= 4.0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ grade.score }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ grade.coefficient }}</td>
+                    <td class="py-3 px-4 text-gray-500">{{ grade.date|date:'d/m/Y' }}</td>
+                    <td class="py-3 px-4 text-right">
+                        <a href="{% url 'grade_edit' grade.pk %}" class="text-primary-500 hover:text-primary-600 text-xs font-medium mr-2">Editar</a>
+                        <form method="post" action="{% url 'grade_delete' grade.pk %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('¿Eliminar esta nota?')" class="text-red-500 hover:text-red-600 text-xs font-medium">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">No hay notas registradas. Selecciona un curso o crea una nueva nota.</p>
+    {% endif %}
+</div>
+{% endblock %}
